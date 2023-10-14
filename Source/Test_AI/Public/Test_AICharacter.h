@@ -29,7 +29,7 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	virtual void SetTarget_Implementation(AActor* Target) override;
 
@@ -48,8 +48,11 @@ protected:
 
 	void OnHealthChange(const FOnAttributeChangeData& Data);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, DisplayName="Melee attack damage", Category = "Character stats")
 		float MeleeAttackDamage = 25.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Character abilities", Category = "Ability system")
+		TSet<TSubclassOf<UGameplayAbility>> CharacterAbilities;
 
 private:
 	/** Top down camera */

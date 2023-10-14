@@ -45,6 +45,8 @@ ATest_AICharacter::ATest_AICharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	AbilitySystemComponent->AddAttributeSetSubobject(AttributeSet);
+
+
 }
 
 void ATest_AICharacter::Tick(float DeltaSeconds)
@@ -56,8 +58,14 @@ void ATest_AICharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Give abilities to character
+	for (TSubclassOf<UGameplayAbility> Ability : CharacterAbilities)
+	{
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability));
+	}
+
 	AttributeSet->SetMeleeDamage(MeleeAttackDamage);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetCurrentHealthAttribute()).AddUObject(this, &ATest_AICharacter::OnHealthChange);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ATest_AICharacter::OnHealthChange);
 }
 
 UAbilitySystemComponent* ATest_AICharacter::GetAbilitySystemComponent() const

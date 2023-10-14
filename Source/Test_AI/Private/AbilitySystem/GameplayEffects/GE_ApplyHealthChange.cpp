@@ -9,7 +9,7 @@ UGE_ApplyHealthChange::UGE_ApplyHealthChange()
 	DurationPolicy = EGameplayEffectDurationType::Instant;
 
 	FGameplayModifierInfo HealthChange;
-	HealthChange.Attribute = UTest_AttributeSet::GetCurrentHealthAttribute();
+	HealthChange.Attribute = UTest_AttributeSet::GetHealthAttribute();
 	HealthChange.ModifierOp = EGameplayModOp::Additive;
 	FSetByCallerFloat SetByCallerHandle;
 	SetByCallerHandle.DataTag = FGameplayTag::RequestGameplayTag(FName("Values.MeleeAttackDamage"));

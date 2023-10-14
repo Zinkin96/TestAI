@@ -21,17 +21,21 @@ public:
 
 protected:
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		TObjectPtr<UAnimMontage> AnimMontageAsset = LoadObject<UAnimMontage>(nullptr, TEXT("/Script/Engine.AnimMontage'/Game/BossyEnemy/Animations/Boss_Attack_Uppercut_InP_Montage.Boss_Attack_Uppercut_InP_Montage'"));
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		TSubclassOf<UGameplayEffect> GameplayEffectClass = UGE_ApplyHealthChange::StaticClass();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		FGameplayEffectSpecHandle SpecHandle;
 
-	virtual void CommitExecute(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
+	UFUNCTION()
+	void DealDamage(FGameplayEventData Payload);
 
-	UPROPERTY()
-		UAbilitySystemComponent* AbilitySystemComponent;
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
-	UPROPERTY()
-		FGameplayEffectSpecHandle MeleeAttackHandle;
+	UAbilitySystemComponent* AbilitySystemComponent;
+
+	FGameplayEffectSpecHandle MeleeAttackHandle;
 };
