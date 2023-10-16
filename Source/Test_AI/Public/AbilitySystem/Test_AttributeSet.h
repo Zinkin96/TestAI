@@ -23,9 +23,13 @@ class TEST_AI_API UTest_AttributeSet : public UAttributeSet
 
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FGameplayAttributeData MaxHealth = 100.0f;
+	ATTRIBUTE_ACCESSORS(UTest_AttributeSet, MaxHealth)
+
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FGameplayAttributeData Health = 100.0f;
-	ATTRIBUTE_ACCESSORS(UTest_AttributeSet, Health)
+		FGameplayAttributeData CurrentHealth = 100.0f;
+	ATTRIBUTE_ACCESSORS(UTest_AttributeSet, CurrentHealth)
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FGameplayAttributeData MeleeDamage = 0.0f;

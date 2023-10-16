@@ -9,6 +9,12 @@
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Test_GeneralPawnInterface.h"
+#include "AbilitySystemInterface.h"
+#include "AbilitySystemComponent.h"
+#include "Abilities/GameplayAbilityTypes.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "BehaviorTree/BehaviorTree.h"
 
 ATest_AIPlayerController::ATest_AIPlayerController()
 {
@@ -16,6 +22,29 @@ ATest_AIPlayerController::ATest_AIPlayerController()
 	DefaultMouseCursor = EMouseCursor::Default;
 	CachedDestination = FVector::ZeroVector;
 	FollowTime = 0.f;
+}
+
+void ATest_AIPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	FHitResult Hit;
+	 bool bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Camera, true, Hit);
+	 if (bHitSuccessful)
+	 {
+		 if (Cast<APawn>(Hit.GetActor()))
+		 {
+			 ITest_GeneralPawnInterface::Execute_SetTarget(GetPawn(), Hit.GetActor());
+		 }
+		 else
+		 {
+			 ITest_GeneralPawnInterface::Execute_SetTarget(GetPawn(), NULL);
+		 }
+	 }
+	 else
+	 {
+		 ITest_GeneralPawnInterface::Execute_SetTarget(GetPawn(), NULL);
+	 }
 }
 
 void ATest_AIPlayerController::BeginPlay()
@@ -49,6 +78,10 @@ void ATest_AIPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &ATest_AIPlayerController::OnTouchTriggered);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &ATest_AIPlayerController::OnTouchReleased);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &ATest_AIPlayerController::OnTouchReleased);
+
+		// Setup ability input events
+		EnhancedInputComponent->BindAction(SetUseAbiliy1Action, ETriggerEvent::Started, this, &ATest_AIPlayerController::OnUseAbiliy1Started);
+		EnhancedInputComponent->BindAction(SetUseAbiliy2Action, ETriggerEvent::Started, this, &ATest_AIPlayerController::OnUseAbiliy2Started);
 	}
 }
 
@@ -80,13 +113,17 @@ void ATest_AIPlayerController::OnSetDestinationTriggered()
 	{
 		CachedDestination = Hit.Location;
 	}
-	
+
 	// Move towards mouse pointer or touch
 	APawn* ControlledPawn = GetPawn();
 	if (ControlledPawn != nullptr)
 	{
 		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
 		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
+		if (IsValid(AbilitySystemComp))
+		{
+			AbilitySystemComp->CancelAllAbilities();
+		}
 	}
 }
 
@@ -114,4 +151,34 @@ void ATest_AIPlayerController::OnTouchReleased()
 {
 	bIsTouch = false;
 	OnSetDestinationReleased();
+}
+
+void ATest_AIPlayerController::OnUseAbiliy1Started()
+{
+	UseAbility(SetUseAbiliy1Action);
+}
+
+void ATest_AIPlayerController::OnUseAbiliy2Started()
+{
+	UseAbility(SetUseAbiliy2Action);
+}
+
+void ATest_AIPlayerController::UseAbility(UInputAction*& InputAction)
+{
+	if (!IsValid(AbilitySystemComp))
+	{
+		return;
+	}
+
+	FGameplayTag* AbilityTag = AbilityInput.Find(InputAction);
+	FGameplayTagContainer qwe(*AbilityTag);
+	AbilitySystemComp->TryActivateAbilitiesByTag(qwe, true);
+	return;
+}
+
+void ATest_AIPlayerController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+
+	AbilitySystemComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn());
 }

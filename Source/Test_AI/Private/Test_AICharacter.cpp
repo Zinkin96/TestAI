@@ -10,6 +10,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "UObject/ConstructorHelpers.h"
+
 
 ATest_AICharacter::ATest_AICharacter()
 {
@@ -46,12 +48,19 @@ ATest_AICharacter::ATest_AICharacter()
 
 	AbilitySystemComponent->AddAttributeSetSubobject(AttributeSet);
 
-
+	HPWidgetComponent->SetupAttachment(RootComponent);
+	HPWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 120.0f));
+	static ConstructorHelpers::FClassFinder<UTestCharacter_HPBar> HPBarWidgetClass(TEXT("/Game/UI/WBP_CharacterState"));
+	if (IsValid(HPBarWidgetClass.Class))
+	{
+		HPWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		HPWidgetComponent->SetWidgetClass(HPBarWidgetClass.Class);
+	}
 }
 
 void ATest_AICharacter::Tick(float DeltaSeconds)
 {
-    Super::Tick(DeltaSeconds);
+	Super::Tick(DeltaSeconds);
 }
 
 void ATest_AICharacter::BeginPlay()
@@ -59,32 +68,24 @@ void ATest_AICharacter::BeginPlay()
 	Super::BeginPlay();
 
 	//Give abilities to character
-	for (TSubclassOf<UGameplayAbility> Ability : CharacterAbilities)
+	for (int32 Index = 0; Index != CharacterAbilities.Num(); ++Index)
 	{
-		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability));
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(CharacterAbilities.Array()[Index], 1, Index));
 	}
 
 	AttributeSet->SetMeleeDamage(MeleeAttackDamage);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ATest_AICharacter::OnHealthChange);
-}
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetCurrentHealthAttribute()).AddUObject(this, &ATest_AICharacter::OnHealthChange);
 
-UAbilitySystemComponent* ATest_AICharacter::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent;
-}
-
-void ATest_AICharacter::SetTarget_Implementation(AActor* Target)
-{
-	TargetActor = Target;
-}
-
-AActor* ATest_AICharacter::GetTarget_Implementation()
-{
-	return TargetActor;
+	//Set HP bar values
+	//
+	if (UTestCharacter_HPBar* HPBarWidget = Cast<UTestCharacter_HPBar>(HPWidgetComponent->GetWidget()))
+	{
+		OnHealthChanged.AddDynamic(HPBarWidget, &UTestCharacter_HPBar::SetHP);
+		HPBarWidget->SetHP(AttributeSet->GetMaxHealth(), AttributeSet->GetCurrentHealth());
+	}
 }
 
 void ATest_AICharacter::OnHealthChange(const FOnAttributeChangeData& Data)
 {
-
+	OnHealthChanged.Broadcast(AttributeSet->GetMaxHealth(), AttributeSet->GetCurrentHealth());
 }
-

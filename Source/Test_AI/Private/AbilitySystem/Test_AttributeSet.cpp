@@ -6,7 +6,7 @@
 
 void UTest_AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
-	if (Attribute == GetHealthAttribute())
+	if (Attribute == GetCurrentHealthAttribute())
 	{
 		NewValue = UKismetMathLibrary::Max(0.0f, NewValue);
 	}

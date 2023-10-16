@@ -9,7 +9,12 @@
 #include "AbilitySystem/Test_AttributeSet.h"
 #include "Components/WidgetComponent.h"
 #include "Test_GeneralPawnInterface.h"
+#include "Delegates/Delegate.h"
+#include "UI/TestCharacter_HPBar.h"
 #include "Test_AICharacter.generated.h"
+
+UDELEGATE()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedDelegate, float, MaxHealth, float, CurrentHealth);
 
 UCLASS(Blueprintable)
 class ATest_AICharacter : public ACharacter, public IAbilitySystemInterface, public ITest_GeneralPawnInterface
@@ -29,11 +34,20 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
 
-	virtual void SetTarget_Implementation(AActor* Target) override;
+	FORCEINLINE virtual void SetTarget_Implementation(AActor* Target) override { TargetActor = Target; }
 
-	virtual AActor* GetTarget_Implementation() override;
+	FORCEINLINE virtual AActor* GetTarget_Implementation() const override { return TargetActor; }
+
+	FORCEINLINE virtual int32 GetHealthPotionsCount_Implementation() const override { return HealPotionsCount; }
+
+	FORCEINLINE virtual void SetHealthPotionsCount_Implementation(int32 Count) override { HealPotionsCount = Count; }
+
+	FORCEINLINE virtual float GetHealthPotionsHealthRestore_Implementation() const override { return HealPotionsHealthRestore; }
+
+	UPROPERTY(BlueprintAssignable)
+		FOnHealthChangedDelegate OnHealthChanged;
 
 protected:
 
@@ -43,13 +57,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		UTest_AttributeSet* AttributeSet = CreateDefaultSubobject<UTest_AttributeSet>(TEXT("AttributeSet"));
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		//UWidgetComponent* WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		UWidgetComponent* HPWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 
 	void OnHealthChange(const FOnAttributeChangeData& Data);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, DisplayName="Melee attack damage", Category = "Character stats")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, DisplayName = "Melee attack damage", Category = "Character stats")
 		float MeleeAttackDamage = 25.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Heal potion count", Category = "Character stats")
+		int32 HealPotionsCount = 3;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, DisplayName = "Heal potions health restore", Category = "Character stats")
+		float HealPotionsHealthRestore = 30.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Character abilities", Category = "Ability system")
 		TSet<TSubclassOf<UGameplayAbility>> CharacterAbilities;
@@ -64,5 +84,6 @@ private:
 		class USpringArmComponent* CameraBoom;
 
 	AActor* TargetActor;
+
 };
 

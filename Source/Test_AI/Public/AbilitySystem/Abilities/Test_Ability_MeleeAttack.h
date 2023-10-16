@@ -30,12 +30,20 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		FGameplayEffectSpecHandle SpecHandle;
 
-	UFUNCTION()
-	void DealDamage(FGameplayEventData Payload);
+	UPROPERTY()
+		float AttackRange = 120.0f;
 
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	UAbilitySystemComponent* AbilitySystemComponent;
 
 	FGameplayEffectSpecHandle MeleeAttackHandle;
+
+	UFUNCTION()
+	void DealDamage(FGameplayEventData Payload);
+
+	bool CheckDistance(AActor* const AvatarActor) const;
+
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
+	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const;
 };

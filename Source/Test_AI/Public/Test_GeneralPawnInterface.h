@@ -27,5 +27,14 @@ public:
 		void SetTarget(AActor* Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		AActor* GetTarget();
+		AActor* GetTarget() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		int32 GetHealthPotionsCount() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		void SetHealthPotionsCount(int32 Count);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		float GetHealthPotionsHealthRestore() const;
 };

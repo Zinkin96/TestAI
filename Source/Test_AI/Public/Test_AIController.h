@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "BehaviorTree/BlackboardComponent.h"
-#include "BehaviorTree/BehaviorTree.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
 #include "Test_AIController.generated.h"
 
 /**
@@ -53,5 +53,4 @@ private:
 	FGenericTeamId ControllerTeamId;
 
 	FGenericTeamId GetGenericTeamId() const;
-
 };
