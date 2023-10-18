@@ -10,6 +10,9 @@
 /**
  * 
  */
+class UAbilityTask_PlayMontageAndWait;
+class UAbilityTask_WaitGameplayEvent;
+
 UCLASS()
 class TEST_AI_API UTest_Ability_UseHealPotion : public UGameplayAbility
 {
@@ -42,4 +45,8 @@ protected:
 	UAbilitySystemComponent* AbilitySystemComponent;
 
 	FGameplayEffectSpecHandle UsePotionHandle;
+
+	UAbilityTask_PlayMontageAndWait* PlayMontageAndWait;
+
+	UAbilityTask_WaitGameplayEvent* WaitGameplayEvent;
 };

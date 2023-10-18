@@ -7,6 +7,7 @@
 #include "AbilitySystemGlobals.h"
 #include "Abilities/GameplayAbilityTypes.h"
 #include "BehaviorTree/BTFunctionLibrary.h"
+#include "Test_AIControllerInterface.h"
 
 EBTNodeResult::Type UBTTask_UseAbility::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -26,6 +27,18 @@ EBTNodeResult::Type UBTTask_UseAbility::ExecuteTask(UBehaviorTreeComponent& Owne
 	AbilitySystemComp->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityTag));
 	FinishDelegate = AbilitySystemComp->OnAbilityEnded.AddUObject(this, &UBTTask_UseAbility::FinishUseAbility);
 	return EBTNodeResult::InProgress;
+
+	//TMap<int32, FGameplayTag> AbilityOrder = ITest_AIControllerInterface::Execute_GetAbilityPriority(OwnerComp.GetAIOwner());
+	//AbilityOrder.KeySort([](int32 A, int32 B) {	return A > B; });
+	//for (TPair<int32, FGameplayTag> Ability : AbilityOrder)
+	//{
+	//	if (AbilitySystemComp->TryActivateAbilitiesByTag(FGameplayTagContainer(Ability.Value)))
+	//	{
+	//		FinishDelegate = AbilitySystemComp->OnAbilityEnded.AddUObject(this, &UBTTask_UseAbility::FinishUseAbility);
+	//		return EBTNodeResult::InProgress;
+	//	}		
+	//}
+	//return EBTNodeResult::Failed;
 }
 
 void UBTTask_UseAbility::FinishUseAbility(const FAbilityEndedData& AbilityEndedData)

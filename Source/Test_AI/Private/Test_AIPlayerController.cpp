@@ -32,19 +32,19 @@ void ATest_AIPlayerController::Tick(float DeltaSeconds)
 	 bool bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Camera, true, Hit);
 	 if (bHitSuccessful)
 	 {
-		 if (Cast<APawn>(Hit.GetActor()))
+		 if (Cast<APawn>(Hit.GetActor()) && (Hit.GetActor() != GetPawn()))
 		 {
 			 ITest_GeneralPawnInterface::Execute_SetTarget(GetPawn(), Hit.GetActor());
 		 }
-		 else
-		 {
-			 ITest_GeneralPawnInterface::Execute_SetTarget(GetPawn(), NULL);
-		 }
+		 //else
+		 //{
+			// ITest_GeneralPawnInterface::Execute_SetTarget(GetPawn(), NULL);
+		 //}
 	 }
-	 else
-	 {
-		 ITest_GeneralPawnInterface::Execute_SetTarget(GetPawn(), NULL);
-	 }
+	 //else
+	 //{
+		// ITest_GeneralPawnInterface::Execute_SetTarget(GetPawn(), NULL);
+	 //}
 }
 
 void ATest_AIPlayerController::BeginPlay()

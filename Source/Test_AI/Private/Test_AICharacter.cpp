@@ -46,7 +46,7 @@ ATest_AICharacter::ATest_AICharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
-	AbilitySystemComponent->AddAttributeSetSubobject(AttributeSet);
+	AbilitySystemComponent->AddAttributeSetSubobject<UTest_AttributeSet>(AttributeSet);
 
 	HPWidgetComponent->SetupAttachment(RootComponent);
 	HPWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 120.0f));

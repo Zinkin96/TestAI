@@ -8,13 +8,14 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "Test_AIControllerInterface.h"
 #include "Test_AIController.generated.h"
 
 /**
  *
  */
 UCLASS()
-class TEST_AI_API ATest_AIController : public AAIController
+class TEST_AI_API ATest_AIController : public AAIController, public ITest_AIControllerInterface
 {
 	GENERATED_BODY()
 
@@ -25,6 +26,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	FORCEINLINE virtual TMap<int32, FGameplayTag> GetAbilityPriority_Implementation() const override { return AbilityPriority; }
+
 private:
 
 	TObjectPtr<UBlackboardData> BlackBoardAsset = LoadObject<UBlackboardData>(nullptr, TEXT("/Script/AIModule.BlackboardData'/Game/AI/Test_Blackboard.Test_Blackboard'"));
@@ -34,10 +37,10 @@ private:
 	UBlackboardComponent* BlackBoardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
 
 	UPROPERTY(VisibleAnywhere)
-		UAIPerceptionComponent* Perception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AI_Perception"));
+		TObjectPtr<UAIPerceptionComponent> Perception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AI_Perception"));
 
 	UPROPERTY(VisibleAnywhere)
-		UAISenseConfig_Sight* SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+		TObjectPtr<UAISenseConfig_Sight> SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 
 	UFUNCTION()
 		virtual void OnPossess(APawn* PossessedPawn) override;
@@ -53,4 +56,10 @@ private:
 	FGenericTeamId ControllerTeamId;
 
 	FGenericTeamId GetGenericTeamId() const;
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Ability priority", Category = "Ability system", meta = (AllowPrivateAccess = true))
+		TMap<int32, FGameplayTag> AbilityPriority;
+
 };

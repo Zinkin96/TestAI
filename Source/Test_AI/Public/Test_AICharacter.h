@@ -52,13 +52,13 @@ public:
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		UAbilitySystemComponent* AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");;
+		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		UTest_AttributeSet* AttributeSet = CreateDefaultSubobject<UTest_AttributeSet>(TEXT("AttributeSet"));
+		TObjectPtr<UTest_AttributeSet> AttributeSet = CreateDefaultSubobject<UTest_AttributeSet>(TEXT("AttributeSet"));
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		UWidgetComponent* HPWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+		TObjectPtr<UWidgetComponent> HPWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 
 	void OnHealthChange(const FOnAttributeChangeData& Data);
 
@@ -83,7 +83,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* CameraBoom;
 
-	AActor* TargetActor;
+	TObjectPtr<AActor> TargetActor;
 
 };
 

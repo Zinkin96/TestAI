@@ -4,7 +4,7 @@
 #include "AbilitySystem/Test_AttributeSet.h"
 #include "Kismet/KismetMathLibrary.h"
 
-void UTest_AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+void UTest_AttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
 {
 	if (Attribute == GetCurrentHealthAttribute())
 	{

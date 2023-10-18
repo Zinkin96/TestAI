@@ -27,16 +27,18 @@ void UTest_Ability_UseHealPotion::RestoreHealth(FGameplayEventData Payload)
 	FGameplayAbilityTargetDataHandle TargetDataHandle = FGameplayAbilityTargetDataHandle(TargetData);
 
 	ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, UsePotionHandle, TargetDataHandle);
+	PlayMontageAndWait->OnCompleted.RemoveDynamic(this, &UTest_Ability_UseHealPotion::K2_EndAbility);
+	WaitGameplayEvent->EventReceived.RemoveDynamic(this, &UTest_Ability_UseHealPotion::RestoreHealth);
 	CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
 }
 
 void UTest_Ability_UseHealPotion::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	UAbilityTask_PlayMontageAndWait* PlayMontageAndWait = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, AnimMontageAsset);
+	PlayMontageAndWait = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, AnimMontageAsset);
 	PlayMontageAndWait->OnCompleted.AddDynamic(this, &UTest_Ability_UseHealPotion::K2_EndAbility);
 	PlayMontageAndWait->Activate();
 
-	UAbilityTask_WaitGameplayEvent* WaitGameplayEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, FGameplayTag::RequestGameplayTag(FName("Effect.ApplyHealthChange")), NULL, true);
+	WaitGameplayEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, FGameplayTag::RequestGameplayTag(FName("Effect.ApplyHealthChange")), NULL, true);
 	WaitGameplayEvent->EventReceived.AddDynamic(this, &UTest_Ability_UseHealPotion::RestoreHealth);
 	WaitGameplayEvent->Activate();
 }

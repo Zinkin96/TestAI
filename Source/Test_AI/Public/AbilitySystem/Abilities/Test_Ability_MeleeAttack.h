@@ -10,6 +10,9 @@
 /**
  *
  */
+class UAbilityTask_PlayMontageAndWait;
+class UAbilityTask_WaitGameplayEvent;
+
 UCLASS()
 class TEST_AI_API UTest_Ability_MeleeAttack : public UGameplayAbility
 {
@@ -38,8 +41,15 @@ protected:
 
 	FGameplayEffectSpecHandle MeleeAttackHandle;
 
+	UAbilityTask_PlayMontageAndWait* PlayMontageAndWait;
+
+	UAbilityTask_WaitGameplayEvent* WaitGameplayEvent;
+
 	UFUNCTION()
 	void DealDamage(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void EndAbilityAndUnbind();
 
 	bool CheckDistance(AActor* const AvatarActor) const;
 

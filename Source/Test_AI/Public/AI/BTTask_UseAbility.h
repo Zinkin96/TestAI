@@ -22,9 +22,9 @@ public:
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
-	UBehaviorTreeComponent* BTComponent;
+	TObjectPtr<UBehaviorTreeComponent> BTComponent;
 
-	UAbilitySystemComponent* AbilitySystemComp;
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComp;
 
 	FDelegateHandle FinishDelegate;
 

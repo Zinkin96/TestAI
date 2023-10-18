@@ -18,6 +18,8 @@ void UTest_Ability_MeleeAttack::DealDamage(FGameplayEventData Payload)
 {
 	if (!CheckDistance(GetOwningActorFromActorInfo()))
 	{
+		PlayMontageAndWait->OnCompleted.RemoveDynamic(this, &UTest_Ability_MeleeAttack::K2_EndAbility);
+		WaitGameplayEvent->EventReceived.RemoveDynamic(this, &UTest_Ability_MeleeAttack::DealDamage);
 		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 		return;
 	}
@@ -32,8 +34,15 @@ void UTest_Ability_MeleeAttack::DealDamage(FGameplayEventData Payload)
 	FGameplayAbilityTargetDataHandle TargetDataHandle = FGameplayAbilityTargetDataHandle(TargetData);
 
 	ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, MeleeAttackHandle, TargetDataHandle);
+	WaitGameplayEvent->EventReceived.RemoveDynamic(this, &UTest_Ability_MeleeAttack::DealDamage);
 	CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
 	return;
+}
+
+void UTest_Ability_MeleeAttack::EndAbilityAndUnbind()
+{
+	PlayMontageAndWait->OnCompleted.RemoveDynamic(this, &UTest_Ability_MeleeAttack::EndAbilityAndUnbind);
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
 bool UTest_Ability_MeleeAttack::CheckDistance(AActor* const AvatarActor) const
@@ -63,11 +72,11 @@ bool UTest_Ability_MeleeAttack::CheckDistance(AActor* const AvatarActor) const
 
 void UTest_Ability_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	UAbilityTask_PlayMontageAndWait* PlayMontageAndWait = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, AnimMontageAsset);
-	PlayMontageAndWait->OnCompleted.AddDynamic(this, &UTest_Ability_MeleeAttack::K2_EndAbility);
+	PlayMontageAndWait = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, AnimMontageAsset);
+	PlayMontageAndWait->OnCompleted.AddDynamic(this, &UTest_Ability_MeleeAttack::EndAbilityAndUnbind);
 	PlayMontageAndWait->Activate();
 
-	UAbilityTask_WaitGameplayEvent* WaitGameplayEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, FGameplayTag::RequestGameplayTag(FName("Effect.ApplyHealthChange")), NULL, true);
+	WaitGameplayEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, FGameplayTag::RequestGameplayTag(FName("Effect.ApplyHealthChange")), NULL, true);
 	WaitGameplayEvent->EventReceived.AddDynamic(this, &UTest_Ability_MeleeAttack::DealDamage);	
 	WaitGameplayEvent->Activate();
 }

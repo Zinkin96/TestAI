@@ -53,7 +53,7 @@ public:
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, DisplayName = "Ability input", Category = "Abilities input")
-		TMap<UInputAction*, FGameplayTag> AbilityInput;
+		TMap<TObjectPtr<UInputAction>, FGameplayTag> AbilityInput;
 
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -83,7 +83,7 @@ private:
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
 
-	UAbilitySystemComponent* AbilitySystemComp;
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComp;
 };
 
 
