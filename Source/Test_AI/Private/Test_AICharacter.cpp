@@ -46,6 +46,8 @@ ATest_AICharacter::ATest_AICharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
+	GetMesh()->SetCollisionProfileName("Ragdoll", true);
+
 	AbilitySystemComponent->AddAttributeSetSubobject<UTest_AttributeSet>(AttributeSet);
 
 	HPWidgetComponent->SetupAttachment(RootComponent);
@@ -83,9 +85,33 @@ void ATest_AICharacter::BeginPlay()
 		OnHealthChanged.AddDynamic(HPBarWidget, &UTestCharacter_HPBar::SetHP);
 		HPBarWidget->SetHP(AttributeSet->GetMaxHealth(), AttributeSet->GetCurrentHealth());
 	}
+
+	OnPotionCountChanged.Broadcast(HealPotionsCount);
+}
+
+void ATest_AICharacter::SetHealthPotionsCount_Implementation(int32 Count)
+{
+	HealPotionsCount = Count;
+	OnPotionCountChanged.Broadcast(HealPotionsCount);
 }
 
 void ATest_AICharacter::OnHealthChange(const FOnAttributeChangeData& Data)
 {
 	OnHealthChanged.Broadcast(AttributeSet->GetMaxHealth(), AttributeSet->GetCurrentHealth());
+	if (Data.NewValue > 0)
+	{
+		return;
+	}
+	if (TObjectPtr<APlayerController> PlayerController = Cast<APlayerController>(GetController()))
+	{
+		DisableInput(PlayerController);
+	}
+	else
+	{
+		GetController()->UnPossess();
+	}
+	AbilitySystemComponent->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("State.Dead")),1);
+	GetMesh()->SetSimulatePhysics(true);
+	GetCapsuleComponent()->SetCollisionProfileName("NoCollision", true);
+	HPWidgetComponent->SetVisibility(false);
 }

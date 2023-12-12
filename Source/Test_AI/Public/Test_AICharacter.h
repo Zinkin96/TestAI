@@ -16,6 +16,10 @@
 UDELEGATE()
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedDelegate, float, MaxHealth, float, CurrentHealth);
 
+UDELEGATE()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPotionCountChangedDelegate, int32, PotionCount);
+
+
 UCLASS(Blueprintable)
 class ATest_AICharacter : public ACharacter, public IAbilitySystemInterface, public ITest_GeneralPawnInterface
 {
@@ -42,17 +46,20 @@ public:
 
 	FORCEINLINE virtual int32 GetHealthPotionsCount_Implementation() const override { return HealPotionsCount; }
 
-	FORCEINLINE virtual void SetHealthPotionsCount_Implementation(int32 Count) override { HealPotionsCount = Count; }
-
 	FORCEINLINE virtual float GetHealthPotionsHealthRestore_Implementation() const override { return HealPotionsHealthRestore; }
+
+	virtual void SetHealthPotionsCount_Implementation(int32 Count) override;
 
 	UPROPERTY(BlueprintAssignable)
 		FOnHealthChangedDelegate OnHealthChanged;
 
+	UPROPERTY(BlueprintAssignable)
+		FOnPotionCountChangedDelegate OnPotionCountChanged;
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");;
+		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		TObjectPtr<UTest_AttributeSet> AttributeSet = CreateDefaultSubobject<UTest_AttributeSet>(TEXT("AttributeSet"));

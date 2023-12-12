@@ -24,21 +24,23 @@ EBTNodeResult::Type UBTTask_UseAbility::ExecuteTask(UBehaviorTreeComponent& Owne
 		return EBTNodeResult::Failed;
 	}
 
-	AbilitySystemComp->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityTag));
-	FinishDelegate = AbilitySystemComp->OnAbilityEnded.AddUObject(this, &UBTTask_UseAbility::FinishUseAbility);
-	return EBTNodeResult::InProgress;
+	//AbilitySystemComp->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityTag));
+	//FinishDelegate = AbilitySystemComp->OnAbilityEnded.AddUObject(this, &UBTTask_UseAbility::FinishUseAbility);
+	//return EBTNodeResult::InProgress;
 
-	//TMap<int32, FGameplayTag> AbilityOrder = ITest_AIControllerInterface::Execute_GetAbilityPriority(OwnerComp.GetAIOwner());
-	//AbilityOrder.KeySort([](int32 A, int32 B) {	return A > B; });
-	//for (TPair<int32, FGameplayTag> Ability : AbilityOrder)
-	//{
-	//	if (AbilitySystemComp->TryActivateAbilitiesByTag(FGameplayTagContainer(Ability.Value)))
-	//	{
-	//		FinishDelegate = AbilitySystemComp->OnAbilityEnded.AddUObject(this, &UBTTask_UseAbility::FinishUseAbility);
-	//		return EBTNodeResult::InProgress;
-	//	}		
-	//}
-	//return EBTNodeResult::Failed;
+	TMap<int32, FGameplayTag> AbilityOrder = ITest_AIControllerInterface::Execute_GetAbilityPriority(OwnerComp.GetAIOwner());
+	AbilityOrder.KeySort([](int32 A, int32 B) {	return A > B; });
+	for (TPair<int32, FGameplayTag> Ability : AbilityOrder)
+	{
+		FGameplayTagContainer AbilityTag;
+		AbilityTag.AddTag(Ability.Value);
+		if (AbilitySystemComp->TryActivateAbilitiesByTag(AbilityTag))
+		{
+			FinishDelegate = AbilitySystemComp->OnAbilityEnded.AddUObject(this, &UBTTask_UseAbility::FinishUseAbility);
+			return EBTNodeResult::InProgress;
+		}		
+	}
+	return EBTNodeResult::Failed;
 }
 
 void UBTTask_UseAbility::FinishUseAbility(const FAbilityEndedData& AbilityEndedData)

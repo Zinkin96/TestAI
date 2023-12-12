@@ -28,8 +28,8 @@ public:
 
 	FDelegateHandle FinishDelegate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FGameplayTag AbilityTag;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//	FGameplayTag AbilityTag;
 
 	void FinishUseAbility(const FAbilityEndedData& AbilityEndedData);
 };

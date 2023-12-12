@@ -4,6 +4,7 @@
 #include "Test_AIPlayerController.h"
 #include "Test_AICharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Test_HUD.h"
 
 ATest_AIGameMode::ATest_AIGameMode()
 {
@@ -23,5 +24,7 @@ ATest_AIGameMode::ATest_AIGameMode()
 	{
 		PlayerControllerClass = PlayerControllerBPClass.Class;
 	}
+
+	HUDClass = ATest_HUD::StaticClass();
 }
 

@@ -12,6 +12,7 @@ UTest_Ability_MeleeAttack::UTest_Ability_MeleeAttack()
 {
 	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Ability.Attack_Melee")));
 	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag(FName("Ability")));
+	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag(FName("Ability")));
 }
 
 void UTest_Ability_MeleeAttack::DealDamage(FGameplayEventData Payload)
@@ -42,6 +43,9 @@ void UTest_Ability_MeleeAttack::DealDamage(FGameplayEventData Payload)
 void UTest_Ability_MeleeAttack::EndAbilityAndUnbind()
 {
 	PlayMontageAndWait->OnCompleted.RemoveDynamic(this, &UTest_Ability_MeleeAttack::EndAbilityAndUnbind);
+	PlayMontageAndWait->OnBlendOut.RemoveDynamic(this, &UTest_Ability_MeleeAttack::EndAbilityAndUnbind);
+	PlayMontageAndWait->OnInterrupted.RemoveDynamic(this, &UTest_Ability_MeleeAttack::EndAbilityAndUnbind);
+	PlayMontageAndWait->OnCancelled.RemoveDynamic(this, &UTest_Ability_MeleeAttack::EndAbilityAndUnbind);
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
@@ -74,6 +78,9 @@ void UTest_Ability_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle
 {
 	PlayMontageAndWait = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, AnimMontageAsset);
 	PlayMontageAndWait->OnCompleted.AddDynamic(this, &UTest_Ability_MeleeAttack::EndAbilityAndUnbind);
+	PlayMontageAndWait->OnBlendOut.AddDynamic(this, &UTest_Ability_MeleeAttack::EndAbilityAndUnbind);
+	PlayMontageAndWait->OnInterrupted.AddDynamic(this, &UTest_Ability_MeleeAttack::EndAbilityAndUnbind);
+	PlayMontageAndWait->OnCancelled.AddDynamic(this, &UTest_Ability_MeleeAttack::EndAbilityAndUnbind);
 	PlayMontageAndWait->Activate();
 
 	WaitGameplayEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, FGameplayTag::RequestGameplayTag(FName("Effect.ApplyHealthChange")), NULL, true);

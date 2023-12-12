@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -22,7 +23,7 @@ class TEST_AI_API ATest_AIController : public AAIController, public ITest_AICont
 
 public:
 
-	ATest_AIController();
+	ATest_AIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 
@@ -51,11 +52,18 @@ private:
 	UFUNCTION(BlueprintCallable)
 		void OnTargetPerceptionUpdated_Delegate(AActor* Actor, FAIStimulus Stimulus);
 
+	UFUNCTION(BlueprintCallable)
+		void SetEnemy(AActor* Actor);
+
 	virtual ETeamAttitude::Type	GetTeamAttitudeTowards(const AActor& Other) const override;
 
 	FGenericTeamId ControllerTeamId;
 
 	FGenericTeamId GetGenericTeamId() const;
+
+	void OnTargetDeath(const FGameplayTag InTag, int32 NewCount);
+
+	FDelegateHandle OnTargetDeathDelegateHandler;
 
 protected:
 

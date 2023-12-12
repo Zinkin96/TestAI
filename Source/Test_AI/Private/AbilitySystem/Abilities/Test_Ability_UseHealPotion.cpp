@@ -12,6 +12,7 @@ UTest_Ability_UseHealPotion::UTest_Ability_UseHealPotion()
 {
 	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Ability.HealPotion")));
 	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag(FName("Ability")));
+	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag(FName("Ability")));
 }
 
 void UTest_Ability_UseHealPotion::RestoreHealth(FGameplayEventData Payload)
@@ -30,6 +31,7 @@ void UTest_Ability_UseHealPotion::RestoreHealth(FGameplayEventData Payload)
 	PlayMontageAndWait->OnCompleted.RemoveDynamic(this, &UTest_Ability_UseHealPotion::K2_EndAbility);
 	WaitGameplayEvent->EventReceived.RemoveDynamic(this, &UTest_Ability_UseHealPotion::RestoreHealth);
 	CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
 void UTest_Ability_UseHealPotion::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -52,6 +54,16 @@ bool UTest_Ability_UseHealPotion::CanActivateAbility(const FGameplayAbilitySpecH
 	}
 
 	if (ITest_GeneralPawnInterface::Execute_GetHealthPotionsCount(AvatarActor) <= 0)
+	{
+		return false;
+	}
+
+	const UTest_AttributeSet* AttributeSet = ActorInfo->AbilitySystemComponent.Get()->GetSet<UTest_AttributeSet>();
+	if (!AttributeSet)
+	{
+		return false;
+	}
+	if (AttributeSet->GetCurrentHealth() >= AttributeSet->GetMaxHealth())
 	{
 		return false;
 	}

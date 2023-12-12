@@ -179,6 +179,8 @@ void ATest_AIPlayerController::UseAbility(UInputAction*& InputAction)
 void ATest_AIPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
-
-	AbilitySystemComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn());
+	if (GetPawn())
+	{
+		AbilitySystemComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn());
+	}
 }

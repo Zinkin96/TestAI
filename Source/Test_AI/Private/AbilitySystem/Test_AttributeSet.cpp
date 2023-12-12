@@ -9,5 +9,6 @@ void UTest_AttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attrib
 	if (Attribute == GetCurrentHealthAttribute())
 	{
 		NewValue = UKismetMathLibrary::Max(0.0f, NewValue);
+		NewValue = UKismetMathLibrary::Min(GetMaxHealth(), NewValue);
 	}
 }
